@@ -1,25 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Bird, Sprout, Shield, Compass, Sparkles, Flame, Gift } from "lucide-react";
 import GooseMascot from "@/components/common/GooseMascot";
 import MoodPicker from "@/components/common/MoodPicker";
 import FeatureCard from "@/components/common/FeatureCard";
 import { useUserStore } from "@/stores/useUserStore";
-
-const GREETINGS = [
-  "早上好呀，今天也要开心哦！",
-  "新的一天，充满了新的可能～",
-  "宝贝，你今天过得怎么样？",
-  "有什么好玩的事情想分享吗？",
-  "记得多喝水，照顾好自己呀～",
-];
+import { useFarmStore } from "@/stores/useFarmStore";
+import { generateGreeting, hasMatureCrops } from "@/utils/greeting";
 
 export default function Home() {
-  const { streakDays, checkIn, lastSignDate, addCoins } = useUserStore();
-  const [greeting] = useState(
-    () => GREETINGS[Math.floor(Math.random() * GREETINGS.length)]
-  );
+  const { streakDays, checkIn, lastSignDate, mood, nickname } = useUserStore();
+  const { plots } = useFarmStore();
   const [showCheckInSuccess, setShowCheckInSuccess] = useState(false);
   const [todayChecked, setTodayChecked] = useState(false);
+
+  const greeting = useMemo(() => {
+    return generateGreeting({
+      streakDays,
+      mood,
+      hasMatureCrops: hasMatureCrops(plots),
+      nickname,
+    });
+  }, [streakDays, mood, plots, nickname]);
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];

@@ -12,6 +12,10 @@ interface GreetingContext {
 interface CachedGreeting {
   date: string;
   period: TimePeriod;
+  streakDays: number;
+  mood: string | null;
+  hasMatureCrops: boolean;
+  nickname: string;
   message: string;
 }
 
@@ -190,10 +194,18 @@ function buildGreeting(context: GreetingContext, period: TimePeriod, seed: strin
 export function generateGreeting(context: GreetingContext): string {
   const today = getTodayString();
   const period = getTimePeriod();
-  const seed = `${today}_${period}_${context.streakDays}_${context.mood}_${context.hasMatureCrops}`;
+  const seed = `${today}_${period}_${context.streakDays}_${context.mood}_${context.hasMatureCrops}_${context.nickname}`;
 
   const cached = getStorage<CachedGreeting | null>("greeting_cache", null);
-  if (cached && cached.date === today && cached.period === period) {
+  if (
+    cached &&
+    cached.date === today &&
+    cached.period === period &&
+    cached.streakDays === context.streakDays &&
+    cached.mood === context.mood &&
+    cached.hasMatureCrops === context.hasMatureCrops &&
+    cached.nickname === context.nickname
+  ) {
     return cached.message;
   }
 
@@ -202,6 +214,10 @@ export function generateGreeting(context: GreetingContext): string {
   setStorage<CachedGreeting>("greeting_cache", {
     date: today,
     period,
+    streakDays: context.streakDays,
+    mood: context.mood,
+    hasMatureCrops: context.hasMatureCrops,
+    nickname: context.nickname,
     message,
   });
 

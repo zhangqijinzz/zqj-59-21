@@ -13,14 +13,16 @@ export default function Home() {
   const [showCheckInSuccess, setShowCheckInSuccess] = useState(false);
   const [todayChecked, setTodayChecked] = useState(false);
 
+  const hasCrops = hasMatureCrops(plots);
+
   const greeting = useMemo(() => {
     return generateGreeting({
       streakDays,
       mood,
-      hasMatureCrops: hasMatureCrops(plots),
+      hasMatureCrops: hasCrops,
       nickname,
     });
-  }, [streakDays, mood, plots, nickname]);
+  }, [streakDays, mood, hasCrops, nickname]);
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
